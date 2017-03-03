@@ -1,0 +1,98 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{Git} \\
+         {\phantom{} \hfill Due Date: March 8, 2017} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+The aim of this activity is to make sure everyone is familiar with
+Git, GitHub, Markdown, and \LaTeX. As discussed in the first class,
+all the course materials and your assignments will be posted on
+GitHub. The benefits of using GitHub in education is already
+known~\cite{feliciano:icse2016}. Some of them include:
+\begin{enumerate}
+  \item You don't need to prepare for your deliverables. Your latest
+    assignments will be shared with course staffs.
+  \item You can work on your assignment anywhere there is an internet
+    connection.
+  \item You will gain industry-relevant skills and practices.
+  \item You will be able to contribute to the course contents with
+    pull requests.
+\end{enumerate}
+
+\section{Exercises}
+
+\begin{exercise}
+
+  This is a warm-up exercise. Visit the Git Tutorial
+  website~\cite{gittutorial} and finish all the stages.
+
+\end{exercise}
+
+\begin{exercise}
+
+  Visit the \LaTeX~Tutorial website~\cite{latextutorial} and finish
+  up to step 8. Make a commit for each step in order to show your
+  progression.
+
+\end{exercise}
+
+\begin{exercise}
+
+  Read the Markdown tutorial~\cite{mdtutorial}, and create a
+  ``README.md'' file in your repository. The file should contain a
+  brief description about your final \LaTeX~document, and it should
+  start with the following line:
+  \begin{verbatim}# is-521\end{verbatim}
+
+\end{exercise}
+
+\begin{exercise}
+
+  In this final exercise, you will be intentionally creating a
+  merge conflict, and you will eventually have to resolve it. Please
+  follow the steps below.
+  \begin{enumerate}
+    \item Create a branch called `test'.
+    \item Make sure you are in the branch `master'.
+    \item Make a modification on the ``README.md'' file. Specifically,
+      you want to make the header to be capitalized:
+      \begin{verbatim}# IS-521\end{verbatim}
+    \item Make a commit.
+    \item Now switch to the branch `test' you created.
+    \item Make a modification on the ``README.md'' file. Specifically,
+      you want to make the header to be:
+      \begin{verbatim}# is-521: Git Exercise\end{verbatim}
+    \item Make a commit. This time, you want to make the author name
+      of the commit to be:
+      \begin{verbatim}Unknown <unknown@unknown.com>\end{verbatim}.
+      You can change the user name by modifying the file at
+      ``.git/config`` or by using the command:
+      \begin{verbatim}git commit --author=...\end{verbatim}.
+    \item Switch back to the branch `master'.
+    \item Merge the change you made in the `test' branch.
+    \item Resolve the conflict. The final header would look like:
+      \begin{verbatim}# IS-521: Git Exercise\end{verbatim}
+    \item After resolving the conflict, push your modifications to
+      your own assignment repository. Make sure your git repository
+      includes the final merge commit.
+  \end{enumerate}
+
+\end{exercise}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
