@@ -1,0 +1,67 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{PGP} \\
+         {\phantom{} \hfill Due Date: March 13, 2017 (before class)} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+In this activity, we learn how to securely encrypt your files and
+personal emails with PGP. We are going to use GnuPG, an open-source
+implementation for PGP.
+
+\section{PGP Key-Signing Party}
+
+The goal of this exercise is twofold: (1) students get to know each
+other; (2) students establish the web of trust using GPG.
+\begin{enumerate}
+  \item Create a PGP key of your own with GPG.
+  \item Push your public key to our web page (by opening a pull
+    request).
+  \item Meet your colleagues and exchange your public keys.
+  \item A student who gets the most signatures will get an extra point
+    (+1).
+  \item You can also ask course staffs to sign your key.
+\end{enumerate}
+
+\section{Ethical Conduct Agreement}
+
+Git allows us to sign tags and commits with your PGP key. Read this
+web page~\cite{gitgpg} and configure your PGP key with Git, and follow
+the steps below.
+
+\begin{enumerate}
+  \item Fork the repository at
+    \url{https://github.com/KAIST-IS521/Agreement}.
+  \item Modify the \texttt{Agreement.md} file appropriately: correct
+    the date and the name.
+  \item Commit and push your modification.
+  \item Tag your commit with ``Agreement''.
+  \item Sign the tag, and push it.
+  \item Open a pull request.
+\end{enumerate}
+
+\section{Sending an encrypted E-mail}
+
+Send an email that is signed by your private key and encrypted by
+professor's public key. The content of your email should contain the
+following line:
+\begin{verbatim}
+Your Name, Your GitHub ID, Your Student ID
+\end{verbatim}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
