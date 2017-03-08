@@ -1,4 +1,4 @@
-# is521
+# IS521
 
 # activity1
 Activity on Latex --> contains the final Latex file
