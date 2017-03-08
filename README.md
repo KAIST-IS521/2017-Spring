@@ -14,5 +14,5 @@ Detailed syllabus should be found
 ### Q&A
 
 Any questions? Create an [issue](Issues.md) in this repository. We will use
-Github as a bulletin board.
+ithub as a bulletin board.
 
