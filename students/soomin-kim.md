@@ -1,0 +1,3 @@
+- Name: Soomin Kim
+- ID  : soomin-kim
+- Key : [soomin-kim.pub](soomin-kim.pub)
