@@ -13,4 +13,3 @@ course of study.
 
 ##### 2017-03-08
 ##### Signer: Hyeongcheol An
-
