@@ -2,6 +2,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[nottoc]{tocbibind}
+\usepackage{booktabs}
 
 \title{First Structured Latex}
 \date{2013-03-08}
@@ -72,6 +73,23 @@ The \LaTeX\ related items are \cite{latexcompanion,knuthwebsite}.
 \section{Footnotes}
 
 This is some example text, but I don't know what this \footnote{\label{myfootnote}This is an old word...} means.
+
+\section{Tables}
+
+\begin{table}[h!]
+  \centering
+  \caption{Caption for the table.}
+  \label{tab:table1}
+  \begin{tabular}{ccc}
+    \toprule
+    Some & actual & content\\
+    \midrule
+    prettifies & the & content\\
+    as & well & as\\
+    using & the & booktabs package\\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \end{document}
 
