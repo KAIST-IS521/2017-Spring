@@ -1,4 +1,4 @@
-# is-521: Git Exercise
+# is-521: Git Exercises
 
 # activity1
 Activity on Latex --> contains the final Latex file
