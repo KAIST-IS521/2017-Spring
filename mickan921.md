@@ -1,3 +1,3 @@
 - Name: Jungsuk Oh
 - ID  : mickan921
-- Key : [mickan921.pub]()
+- Key : [mickan921.pub](./mickan921)
