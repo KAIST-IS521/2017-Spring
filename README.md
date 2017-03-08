@@ -15,4 +15,3 @@ Detailed syllabus should be found
 
 Any questions? Create an [issue](Issues.md) in this repository. We will use
 Github as a bulletin board.
-
