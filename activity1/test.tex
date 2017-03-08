@@ -1,6 +1,7 @@
-\documentclass{article}
+ss{article}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage[nottoc]{tocbibind}
 
 \title{First Structured Latex}
 \date{2013-03-08}
@@ -12,6 +13,8 @@
 \pagenumbering{gobble}
 \newpage
 \pagenumbering{arabic}
+
+\tableofcontents
 
 \section{First Section}
 
@@ -48,12 +51,24 @@ Hello World!
 
 \section{Picture}
 
+This is a picture about Seoul :
+
 \begin{figure}
   \includegraphics[width=\linewidth]{seoul.png}
   \caption{Seoul}
   \label{fig:seoul1}
 \end{figure}
 
+\section{Bibliography}
+Three items are cited: \textit{The \LaTeX\ Companion} book \cite{latexcompanion}, the Einstein
+journal paper \cite{einstein}, and the Donald Knuth's website \cite{knuthwebsite}. 
+The \LaTeX\ related items are \cite{latexcompanion,knuthwebsite}. 
+ 
+\medskip
+ 
+\bibliographystyle{unsrt}
+\bibliography{sample}
 
 \end{document}
+
 
