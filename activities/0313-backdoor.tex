@@ -1,0 +1,37 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{Backdoor} \\
+         {\phantom{} \hfill Due Date: March 20, 2017 (before class)} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+The primary goal of this activity is to learn how backdoors work by
+creating your own. You will build an interpreter, and programs based
+upon a simple language called ``Mini Language''.
+
+\section{Mini Language}
+
+We first introduce Mini Language, a simple register-based language.
+This language consists of 12 instructions including \texttt{halt},
+\texttt{load}, \texttt{store}, etc.
+
+% Each instruction consumes 4 bytes: 1 byte for opcode, and 3 bytes for
+% operands. If an opcode such as \texttt{halt} does not require any
+% operand,
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}

@@ -1,1 +1,7 @@
 *.bbl
+*.swp
+*.aux
+*.blg
+*.log
+*.out
+*.pdf
