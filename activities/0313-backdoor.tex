@@ -48,6 +48,10 @@ number representation to denote an immediate.
 
 \subsection{Opcode}
 
+There are 14 opcodes in total. Your VM should terminate immediately if
+it encounters an unknown opcode, i.e., opcodes other than the 14
+opcodes defined, with an error message.
+
 \begin{description}
 
   \item [\texttt{halt}]~\\
@@ -139,13 +143,18 @@ number representation to denote an immediate.
   \item [\texttt{puts (reg)}]~\\
     %
     This instruction outputs an ASCII string (terminated by a NULL
-    character) located at memory address (reg) to the screen.
+    character) located at memory address (reg) to the screen. The
+    semantics of puts instruction is equivalent to the puts function
+    in LIBC.
 
   \item [\texttt{gets (reg)}]~\\
     %
     This instruction takes an ASCII string (terminated by a NULL
     character) as input from STDIN and store the string to memory
-    address (reg).
+    address (reg). The semantics of gets instruction is equivalent to
+    the gets function in LIBC. Specifically, reading stops when a
+    newline character is found, and a NULL character is appended to
+    the end of the string.
 
 \end{description}
 
