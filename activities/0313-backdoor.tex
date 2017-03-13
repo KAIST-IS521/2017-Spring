@@ -4,6 +4,7 @@
 \usepackage{hyperref}
 \usepackage{amsthm}
 \usepackage[numbers,sort&compress]{natbib}
+\usepackage{listings}
 
 \theoremstyle{definition}
 \newtheorem{exercise}{Exercise}
@@ -18,18 +19,260 @@
 \section{Activity Overview}
 
 The primary goal of this activity is to learn how backdoors work by
-creating your own. You will build an interpreter, and programs based
-upon a simple language called ``Mini Language''.
+creating your own. You will have to build an interpreter and programs
+based upon a simple language called ``Mini Language''. You will also
+introduce a backdoor to your own interpreter.
 
 \section{Mini Language}
 
-We first introduce Mini Language, a simple register-based language.
-This language consists of 12 instructions including \texttt{halt},
-\texttt{load}, \texttt{store}, etc.
+We first introduce Mini Language, a simple language that runs on a
+register-based virtual machine. This language consists of 14
+instructions including \texttt{halt}, \texttt{load}, \texttt{store},
+etc. Each instruction starts with an opcode followed by at most 3
+operands. There is at least one space character between an opcode and
+the first operand. Each operand is separated by a comma. An operand
+can be either a register or an immediate. An immediate can represent a
+number or an address. Finally, we assume that each process is given a
+8k heap memory starting at the address zero to 8192. This address
+space does not overlap with code.
 
-% Each instruction consumes 4 bytes: 1 byte for opcode, and 3 bytes for
-% operands. If an opcode such as \texttt{halt} does not require any
-% operand,
+\subsection{Operands}
+
+\paragraph{Register (reg).} There are 256 available registers in our
+language. We denote a register by `r' followed by a register ID:
+\texttt{r0, r1, \ldots, r255}. Each register is 32-bit (4-byte) long.
+
+\paragraph{Immediate (imm).} An immediate operand indicates either an
+integer number or an address depending on the opcode. We use a simple
+number representation to denote an immediate.
+
+\subsection{Opcode}
+
+\begin{description}
+
+  \item [\texttt{halt}]~\\
+    %
+    This instruction does not require any operand. This instruction
+    simply terminates the current process.
+
+  \item [\texttt{load (reg), (reg)}]~\\
+    %
+    This instruction loads a 1-byte value from memory located at
+    address (the second register) into the first register. The high 24
+    bits are zeroed out. For example, \texttt{load r0, r1} means: load
+    a 8-bit value from the address at \texttt{r1} into \texttt{r0}.
+
+  \item [\texttt{store (reg), (reg)}]~\\
+    %
+    This instruction stores a 1-byte value of the second register to
+    memory located at address (the first register). For example,
+    \texttt{store r1, r2} means: store a byte value (the lower 8-bit
+    of \texttt{r2}) to memory address at \texttt{r1}.
+
+  \item [\texttt{move (reg), (reg)}]~\\
+    %
+    This instruction moves a 32-bit value from a register to another.
+    Both operands should be a register, but not an immediate. For
+    example, \texttt{move r1, r0} means: move a 32-bit value from
+    \texttt{r0} to \texttt{r1}.
+
+  \item [\texttt{puti (reg), (imm)}]~\\
+    %
+    This instruction moves an 8-bit immediate value to a register. The
+    upper 24-bit of the destination register is zeroed out.
+
+  \item [\texttt{add (reg), (reg), (reg)}]~\\
+    %
+    This instruction adds two values from the second and the third
+    register, and store the result to the first register. For example,
+    \texttt{add r0, r1, r2} means: add the value of \texttt{r1} and
+    \texttt{r2} and store the result to \texttt{r0}. When an overflow
+    happens the result will be wrapped around the max integer
+    ($2^{32}-1$). In other words, \texttt{0xffffffff + 0x1 = 0x0}.
+
+  \item [\texttt{sub (reg), (reg), (reg)}]~\\
+    %
+    This instruction subtracts two values from the second and the
+    third register, and store the result to the first register. For
+    example, \texttt{sub r0, r1, r2} means: subtract the value of
+    \texttt{r2} from \texttt{r1} and store the result to \texttt{r0}.
+    Overflow conditions are handled the same as in addition
+    (\texttt{add}).
+
+  \item [\texttt{gt (reg), (reg), (reg)}]~\\
+    %
+    This instruction compares two values of the second and
+    the third register, and store the comparison result to the first
+    register: 1 if the second register is greater than the third
+    register; 0 if otherwise.
+
+  \item [\texttt{ge (reg), (reg), (reg)}]~\\
+    %
+    This instruction compares two values of the second and
+    the third register, and store the comparison result to the first
+    register: 1 if the second register is greater than or equal to the
+    third register; 0 if otherwise.
+
+  \item [\texttt{eq (reg), (reg), (reg)}]~\\
+    %
+    This instruction compares two values of the second and
+    the third register, and store the comparison result to the first
+    register: 1 if the second and the third register have the same
+    value; 0 if otherwise.
+
+  \item [\texttt{ite (reg), (imm), (imm)}]~\\
+    %
+    This instruction (if-then-else) checks the value of the first
+    register, and changes the instruction pointer to have a value
+    (either of the second and the third operand). When the register
+    value is greater than zero, then the instruction pointer will have
+    the value of the second operand in the next execution.  If the
+    register value is equal to zero, then the instruction pointer will
+    have the value of the third operand.
+
+  \item [\texttt{jump (imm)}]~\\
+    %
+    This is a jump instruction that changes the instruction pointer.
+    The immediate value indicates an address to be executed in the
+    next instruction.
+
+  \item [\texttt{puts (reg)}]~\\
+    %
+    This instruction outputs an ASCII string (terminated by a NULL
+    character) located at memory address (reg) to the screen.
+
+  \item [\texttt{gets (reg)}]~\\
+    %
+    This instruction takes an ASCII string (terminated by a NULL
+    character) as input from STDIN and store the string to memory
+    address (reg).
+
+\end{description}
+
+\subsection{Bytecode}
+
+Each instruction consumes 4 bytes when it is compiled: the first byte
+indicates the opcode, and the rest three bytes represent the operands.
+We always use 4 bytes for an instruction even though it does not
+require three operands. Unused operands can have any value in the
+binary form. For example, both \texttt{0x00000000} and
+\texttt{0x00111111} are considered as a \texttt{halt} instruction.
+Notice the first byte (the operand) should be zero, meaning a halt
+opcode, in both cases.
+
+\section{Compiler}
+
+We provide a compiler written in OCaml. This compiler takes in a
+program written in Mini Language, and outputs a bytecode. The compiler
+is deliberately simple, e.g., it does not even type check. However, it
+should be enough to be used in this activity. If you can improve this
+compiler, and create a pull request, we will give you +10 extra
+credit.
+
+\section{Interpreter (VM)}
+
+We provide starter code for creating an interpreter for Mini Language.
+Your interpreter takes in a program (in byte code) and executes the
+program starting from the very first instruction of the program. When
+a program is loaded, your interpreter allocates a heap memory range
+from 0 to 8192. A program written in Mini Language can use hard-coded
+addresses to access the heap memory. When accessing a memory region
+outside of the predefined area, your VM should terminate immediately
+with an error message.
+
+For your information, the current starter code is derived from a
+project called Mini-VM~\cite{minivm}.
+
+\section{Login Program}
+
+You need to create a simple program written in Mini Language. The
+pseudocode of this program is given in Listing~\ref{lst:login}.
+
+\begin{lstlisting}[language=C,
+                   caption={Pseudocode for Login Program.},
+                   label=lst:login,
+                   basicstyle=\footnotesize\ttfamily]
+void main(void)
+{
+  char* buf = malloc( /* some amount */ );
+  printf( "User: " );
+  gets( buf );
+  if ( strcmp( buf, "user" ) == 0 ) {
+    printf( "Password: " );
+    gets( buf );
+    if ( strcmp( buf, "password" ) == 0 ) {
+      puts( "Success" );
+    } else {
+      puts( "Failure" );
+    }
+  } else {
+    puts( "Failure" );
+  }
+  exit( 0 );
+}
+\end{lstlisting}
+
+\section{Test Program}
+
+You need to write a simple test program in Mini Language. This is to
+demonstrate that your VM is running correctly. We ask you to write a
+markdown description for your test program that includes a pseudocode
+(in C). The markdown description should clearly show what is the
+expected input/output of the program.
+
+\section{Installing Backdoor}
+
+Install a backdoor to the interpreter you created. This backdoor
+allows you to bypass the authentication process of the login program.
+Specifically, when you use a user ID ``superuser'', then this backdoor
+allows you to bypass the check, and the program will immediately
+return the ``Success'' message without providing any password. Your
+goal is to create a backdoor in the interpreter, which can detect your
+login program, and surreptitiously change the control flow of the
+program when a user ID ``superuser'' is given.
+
+\section{Final Deliverables}
+
+We expect you to push your source code to your own public repository
+(backdoor-your\_id). You \emph{must} follow the file naming convention
+described below. \textbf{If otherwise, course staffs will immediately
+deduct half of the available score}.
+
+\begin{enumerate}
+
+  \item \textbf{./interpreter/} directory contains source code for
+    your Mini Language Interpreter (VM).
+
+  \item \textbf{./login/login.mini} is a login program written in Mini
+    Language. The program should be semantically equivalent to the
+    pseudocode given in Listing~\ref{lst:login}.
+
+  \item \textbf{./test/test.mini} file is a test program written in
+    Mini Language. We expect to see a unique test program for each
+    student.
+
+  \item \textbf{./test/test.md} file is a description of the test
+    program. This write-up includes a pseudocode of your test program
+    as well as a brief description of your program. In the
+    description, you need to clearly mention the expected input/output
+    of the program.
+
+  \item \textbf{./backdoor/} directory contains source code for your
+    Mini Language Interpreter (VM) with your own backdoor. This
+    directory should have the \emph{same} list of files as in the
+    ./interpreter/ directory.
+
+  \item \textbf{./compiler/compiler.ml} file is a simplistic version
+    of compiler for Mini Language. You can \emph{optionally} improve
+    this compiler to get extra points (+5). If you made a modification
+    on this file, please clearly indicate in the \texttt{./README.md}
+    file that you modified the compiler.
+
+  \item \textbf{./README.md} file contains a write-up. This write-up
+    simply lists what you did for each directory and file, and what
+    you learned from this activity.
+
+\end{enumerate}
 
 \bibliography{references}
 \bibliographystyle{plainnat}
