@@ -145,7 +145,8 @@ opcodes defined, with an error message.
     next instruction. The target address is an absolute index of an
     instruction in the code. For example, \texttt{jump 2} means the
     next instruction pointer should point to the third instruction of
-    the code.
+    the code. If the target instruction does not exist, the VM should
+    produce an error message and terminate immediately.
 
   \item [\texttt{puts (reg)}]~\\
     %
