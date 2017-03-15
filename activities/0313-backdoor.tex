@@ -145,7 +145,8 @@ opcodes defined, with an error message.
     This instruction outputs an ASCII string (terminated by a NULL
     character) located at memory address (reg) to the screen. The
     semantics of puts instruction is equivalent to the puts function
-    in LIBC.
+    in LIBC except that it does not append a newline character at the
+    end.
 
   \item [\texttt{gets (reg)}]~\\
     %
