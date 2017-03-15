@@ -34,7 +34,8 @@ the first operand. Each operand is separated by a comma. An operand
 can be either a register or an immediate. An immediate can represent a
 number or an address. Finally, we assume that each process is given a
 8k heap memory starting at the address zero to 8192. This address
-space does not overlap with code.
+space does not overlap with code, which is also started from address
+zero.
 
 \subsection{Operands}
 
@@ -130,15 +131,21 @@ opcodes defined, with an error message.
     register, and changes the instruction pointer to have a value
     (either of the second and the third operand). When the register
     value is greater than zero, then the instruction pointer will have
-    the value of the second operand in the next execution.  If the
+    the value of the second operand in the next execution. If the
     register value is equal to zero, then the instruction pointer will
-    have the value of the third operand.
+    have the value of the third operand. The instruction pointer can
+    have an address ranging from 0 (the first instruction) to $N$,
+    where $N$ is the number of instructions in the code. See
+    \texttt{jump} instruction for more details.
 
   \item [\texttt{jump (imm)}]~\\
     %
     This is a jump instruction that changes the instruction pointer.
     The immediate value indicates an address to be executed in the
-    next instruction.
+    next instruction. The target address is an absolute index of an
+    instruction in the code. For example, \texttt{jump 2} means the
+    next instruction pointer should point to the third instruction of
+    the code.
 
   \item [\texttt{puts (reg)}]~\\
     %
