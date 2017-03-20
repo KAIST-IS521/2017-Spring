@@ -1,0 +1,176 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{listings}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{Worm} \\
+         {\phantom{} \hfill Due Date: March 27, 2017 (before class)} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+In this activity, you need to build your own worm. The worm exploits a
+vulnerability introduced by a backdoor installed in a \emph{vulnet},
+which is a simple telnet-like service. Your goal is to design a worm
+that can automatically scan a specified network range, and can
+propagate through the network by exploiting the vulnerability. You
+will be working on a \emph{private repository} for this activity,
+since the outcome of this activity can be security-sensitive. You can
+use any language to write your worm, although we strongly recommend
+you to use C. We do not provide any starter code for this activity.
+Please frequently check the course git repository to get updates on
+the activity. We also recommend you to ``watch'' the original repo.
+
+\section{The vulnet} \label{s:vulnet}
+
+The vulnet service provides a virtual terminal connection to users. It
+uses a password-based authentication, and spawns a remote
+\texttt{bash} shell to the authenticated users. We provide source code
+for vulnet~\cite{vulnet}. You should be able to spot an obvious
+backdoor routine from the source code. Specifically, when a user types
+in ``superuser'' as a user name, the program immediately logs the user
+in without taking a password. The vulnet uses TCP port number 2323 by
+default.
+
+\section{The Worm}
+
+The primary goal of this activity is to design your own worm. The worm
+should exploit the vulnerability of vulnet introduced by the backdoor
+described in the previous section.
+
+\subsection{The Operation}
+
+The worm runs in the following manner:
+
+\begin{enumerate}
+
+  \item It scans a user-specified network range. For every IP in the
+    range, it checks if TCP port number 2323 can be connected. Recall
+    the vulnerability described in \S\ref{s:vulnet}.
+
+  \item Once connected, it checks if this port is used as vulnet, and
+    tries to log in to the server by exploiting the vulnerability. In
+    case the vulnet server does not have a backdoor, it simply goes to
+    the next target.
+
+  \item If it can be sure that the server has the backdoor, it then
+    tries to obtain the valid user name and the password. Hint:
+    \texttt{/proc/} filesystem (procfs) can be useful.
+    \label{step:infer}
+
+  \item If there exists a file in \texttt{/tmp/myworm}, the worm
+    assumes that the machine has already got infected, and goes to the
+    next step. Otherwise, it stores the binary of itself (the worm
+    binary) to \texttt{/tmp/myworm}. For the purpose of this exercise,
+    we just close the connection at this point without running the
+    worm binary, but in reality, you would run the binary. N.B., we
+    will deduct points if you execute the worm after propagation.
+
+  \item It re-connects to the server with the obtained user name and
+    the password from Step~\ref{step:infer}. If the login works, it
+    records the IP address of the vulnerable host along with a user
+    name and a password. Otherwise, it simply records the IP address
+    with a user name ``superuser''.
+
+  \item This process iterates until the scanning process ends. The
+    final output is a CSV (Comma-Separated Values) file that has three
+    tuples per each line: IP, user name, password. An example would
+    be:
+    \begin{verbatim}
+    123.0.0.1,admin,secret
+    42.42.42.42,superuser,
+    ...
+    \end{verbatim}
+
+\end{enumerate}
+
+\subsection{Specification}
+
+The worm has the following specification.
+
+\begin{enumerate}
+
+  \item The worm binary has the name \texttt{myworm} (all lowercase).
+
+  \item The worm binary takes in three command-line arguments: the
+    first and the second argument specify the lower and the upper ip
+    address (IPv4) respectively. The third argument specifies the name
+    of an output file (the default should be \texttt{./slaves.csv}).
+    For example, if the first and the second argument are
+    $192.168.0.0$ and $192.168.255.255$, then the worm will scan
+    65,536 hosts from the given range.
+    %
+    The third argument is optional, and if it is not given, the
+    default file name is used. For example, the following command will
+    scan 256 hosts, and store the list of vulnerable hosts in the
+    \texttt{./slaves.csv} file.
+    \begin{verbatim}
+    ./myworm 192.168.0.0 192.168.0.255
+    \end{verbatim}
+
+  \item When an incorrect range is given as input, the program should
+    return an error message, and terminates the process. For example,
+    the following is a valid command.
+    \begin{verbatim}
+    ./myworm 192.168.0.0 192.168.0.0
+    \end{verbatim} But, the following is \emph{not} a valid command.
+    \begin{verbatim}
+    ./myworm 192.168.10.0 192.168.0.0
+    \end{verbatim}.
+
+  \item The worm process runs in the background. Specifically, it
+    calls a Linux API, called \texttt{daemon}. See the manual
+    (\texttt{man daemon}) for more information. You do not need to use
+    the \texttt{daemon} API if you prefer to use \texttt{fork} and
+    \texttt{setsid}.
+
+\end{enumerate}
+
+\section{Competition (Extra Points)}
+
+We will pick the most well-designed worm, and use it in the next
+activity. Furthermore, we will give +10 extra points to the student!
+
+\section{Final Deliverables}
+
+We expect you to push your source code to your own private repository
+(worm-your\_id). Do not push your binaries to the repository. You
+\emph{must} follow the file naming convention described below.
+\textbf{If otherwise, course staffs will immediately deduct half of
+the available score}.
+
+\begin{enumerate}
+
+  \item \textbf{./Makefile} file is to build your worm. When we type
+    ``make'', it should automatically build your program and place the
+    \texttt{myworm} binary to \texttt{./build/myworm}. Again, you can
+    use any language to implement your worm, but the final binary
+    executable should be placed in \texttt{./build/myworm} after
+    typing ``make''. N.B. Never commit the binary to the repository.
+    We will immediately deduct 3 points if you commit a binary itself
+    to the build directory.
+
+  \item \textbf{./src/} directory contains the source of your worm.
+    You can use any language you want. N.B. Points will be deducted
+    for the lack of necessary comments. Please make your code
+    readable.
+
+  \item \textbf{./README.md} file contains a write-up. This write-up
+    simply lists what you did for each directory and file, and what
+    you learned from this activity.
+
+\end{enumerate}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
