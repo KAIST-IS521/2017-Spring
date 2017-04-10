@@ -1,0 +1,135 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{listings}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{Anti-anti-malware} \\
+         {\phantom{} \hfill Due Date: April 12, 2017 (before class)} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+In this activity, you will improve upon the malware you designed
+(myworm) in the previous activity. The major goal in this activity is
+to apply several anti-AV techniques we learned in the class to your
+worm.
+
+You should use the existing worm-* private repo. Specifically, you
+should create a ``2nd-activity'' branch forked off from your own
+master branch, and push all your modifications to the branch. You
+\emph{must} fork your 2nd-activity branch from the \emph{head} of your
+own master branch. In other words, you should use the latest code from
+your master. Your final submission should be a pull request from the
+branch to your own master.
+
+You can modify your worm (at master branch) before you start this
+activity if your worm was not complete at the moment of prior
+submission. In any case, you should clearly fork off from the head of
+your master branch.
+
+\section{Part 1}
+
+One of the simplest anti-forensic techniques we learned in the class
+is to remove the running binary itself. This makes it difficult for
+defenders to collect malware samples. Furthermore, the AV we designed
+in the previous activity would not detect your worm from the
+process-scanning mode, because the corresponding binary file simply
+does not exist.
+
+To achieve this, you can simply call \texttt{unlink} function as soon
+as your worm starts running. You can further confuse the AV by
+modifying the process name as well: the proc file system will reveal a
+different path other than \texttt{myworm} when your worm is running.
+
+However, this technique introduces a small problem: your worm needs to
+propagate, but you do not have the program binary anymore on your
+disk. Thus, it is desirable to keep the ability of the worm while
+making it undetectable. To summarize,
+%
+\begin{enumerate}
+
+  \item Your worm needs to run in the same way as in the previous
+    activity except that it does some anti-AV tricks at the beginning.
+
+  \item Specifically, your worm deletes itself when it starts.
+
+  \item It also changes the name of the process, so the process
+    appears to have a different name other than \texttt{myworm} when
+    we see the running processes using \texttt{ps} command. Be
+    creative. Which name would you use to confuse users? Hint:
+    ``\texttt{man prctl}''.
+
+  \item Even though the binary of your worm does not present in your
+    disk, your worm should be able to propagate through the network by
+    exploiting the vulnet vulnerability.
+
+\end{enumerate}
+
+\section{Part 2}
+
+In this part, we consider an improved version of vulnet
+server~\cite{vulnet}. You should be able to find the version in the
+``dumb-protection'' branch of the vulnet repository. The improved
+version now performs a series of simple checks in order to prevent the
+authenticated superuser from obtaining the user name and the password
+of vulnet processes. However, this protection mechanism has some
+vulnerabilities. Re-design your worm to bypass the defense and get the
+user name and the password of the running processes. Your worm should
+be able to exploit both the previous and the modified version of
+vulnet. Notice there are \emph{multiple} ways to exploit this
+vulnerability.
+
+Hint: One easy way to attack the new protection mechanism is to use a
+bash trick: you can dynamically generate command line strings with the
+help of several bash expressions. See the ``EXPANSION'' section of the
+man page of bash: \texttt{man bash}.
+
+\section{Deliverables}
+
+We expect you to push your source code to your own private repository
+(worm-your\_id). Your final submission for this activity is a pull
+request to your own master branch from your 2nd-activity branch.
+
+You \emph{must} follow the file naming convention described below. You
+are allowed to add extra files that are not specifically mentioned in
+the list below such as 3rd-party libraries or configuration files, but
+you should always include the followings.  \textbf{If otherwise,
+course staffs will immediately deduct half of the available score}.
+
+\begin{enumerate}
+
+  \item \textbf{./Makefile} file. We should be able to build your worm
+    simply by typing ``make''. We will use the VM that we provided in
+    the course to compile your worm. If there is any necessary
+    dependencies to build your worm, your Makefile \emph{must}
+    automatically install them. The produced binary should be placed
+    in \textbf{./build/myworm}.
+
+  \item \textbf{./src/} directory contains the source of your worm.
+    You can use any language you want. N.B. Points will be deducted
+    for the lack of necessary comments. Please make your code
+    readable.
+
+  \item \textbf{./README.md} file contains a write-up. This write-up
+    should have three sections. The first section is ``Deliverables'',
+    which simply lists what you did for each directory and file. The
+    second section is ``Summary'', which essentially summarizes how
+    you solved the problems in Part 1 and 2. Finally, the last section
+    is ``Lesson''. In this section, you write what you learned from
+    this activity.
+
+\end{enumerate}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
