@@ -1,0 +1,149 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{listings}
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{Debugger} \\
+         {\phantom{} \hfill Due Date: May 1, 2017 (before class)} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+In this activity, you build your own custom value tracer with the
+ptrace debugging API~\cite{ptrace}. Before anything else, remember to
+read the manual: \texttt{man ptrace}. Your value tracer takes in an
+executable and a CSV file as input, and prints out a sequence of
+register or memory values specified in the CSV file by running the
+executable.
+
+Your value tracer takes in an executable file as the first argument,
+and a Comma-Separated Values (CSV)~\cite{csvwiki} file as the second
+argument. For example, the following command loads \texttt{/bin/ls}
+with a CSV file \texttt{a.csv}:
+%
+\begin{verbatim}./tracer /bin/ls ./a.csv\end{verbatim}
+
+\section{CSV File}
+
+The CSV file consists of two columns: the first column indicates
+breakpoint addresses in hexadecimal, and the second column represents
+tracing targets. A breakpoint address always starts with the prefix
+`0x'.  Tracing targets are either a register or a memory address. Any
+tracing target starts with `0x' is considered to be a memory address.
+If tracing target is an integer between 0 and 8, it means a register
+ID specified in Table~\ref{tab:regid}. If otherwise, it is considered
+to be an error: your tracer should terminate with an error message.
+
+Consider the following CSV line: \texttt{0x1000,0x4000}.
+%
+This line means that your value tracer needs to print out the 4-byte
+value at 0x4000 when the program counter of the program under test is
+at 0x1000. Notice, we assume that your value tracer always prints out
+4-byte values for simplicity.
+
+You can consider each line of the CSV file as a breakpoint. You cannot
+have duplicate breakpoint addresses in the CSV file, but you do not
+need to have an ordered addresses in the CSV. For example, suppose we
+have the following CSV file with 4 lines.
+%
+\begin{verbatim}
+0x1000,0
+0x1009,2
+0x1003,1
+0x1002,0
+\end{verbatim}
+%
+In the above case, your value tracer should insert four distinct
+breakpoints at address 0x1000, 0x1002, 0x1003, and 0x1009. Notice the
+program under test can execute the same address more than once, e.g.,
+when it has a loop. Suppose your program executes an instruction at
+address 0x1000 for five times. In this case, your value tracer should
+print out the value of eax exactly 5 times.
+
+When the given CSV has duplicate breakpoint addresses, then your value
+tracer should emit an error message, and immediately exit. For
+example, given the following CSV:
+\begin{verbatim}
+0x1000,0
+0x2000,5
+0x1000,0x2000
+\end{verbatim}
+%
+Your value tracer should terminate, because the address 0x1000 appears
+twice in the CSV. Similarly, when there is an invalid address, your
+tracer should exit with an error message.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{lc}
+    ID & Register Name \\\hline
+    0 & eax \\
+    1 & ebx \\
+    2 & ecx \\
+    3 & edx \\
+    4 & esi \\
+    5 & edi \\
+    6 & ebp \\
+    7 & esp \\
+    8 & eip \\\hline
+  \end{tabular}
+  \caption{Register ID}
+  \label{tab:regid}
+\end{table}
+
+\section{Value Tracer}
+
+Your value tracer binary should have the name \texttt{tracer} when it
+is compiled. Your value tracer inserts software breakpoints (0xcc) at
+the addresses specified in the CSV file, and run the program under
+ptrace. Every time a breakpoint hits, your value tracer restores the
+original instruction and executes it in order to preserve the
+semantics of the original binary.
+
+\paragraph{Evaluation.} To evaluate your value tracer, we will prepare
+for a list of binary and CSV pairs, and run your value tracer on them
+to see if it can correctly print out the values.
+
+\section{Deliverables}
+
+We expect you to push your source code to your own private repository
+(tracer-your\_id). You \emph{must} follow the file naming convention
+described below. You are allowed to add extra files that are not
+specifically mentioned in the list below such as 3rd-party libraries
+or configuration files, but you should always include the followings.
+\textbf{If otherwise, course staffs will immediately deduct half of
+the available score}.
+
+\begin{enumerate}
+
+  \item \textbf{./Makefile} file. We should be able to build your
+    value tracer simply by typing ``make''. We will use the VM that we
+    provided in the course to compile your value tracer. If there is
+    any necessary dependencies to build your value tracer, your
+    Makefile \emph{must} automatically install them. The produced
+    binary should be placed in \textbf{./build/tracer}.
+
+  \item \textbf{./src/} directory contains the source of your value
+    tracer. You should use C for this activity. N.B. Points will be
+    deducted for the lack of necessary comments. Please make your code
+    readable.
+
+  \item \textbf{./README.md} file contains a write-up. This write-up
+    simply lists what you did for each directory and file, and what
+    you learned from this activity.
+
+\end{enumerate}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
