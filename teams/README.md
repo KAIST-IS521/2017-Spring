@@ -17,7 +17,7 @@ Put :crown:(```:crown:```) to the right of each team leader's id.
 - mickan921
 
 ### Team 3
-- Hyeongcheol-An
+- Hyeongcheol-An :crown:
 - seongil-wi
 - lbh0307
 - pr0v3rbs
