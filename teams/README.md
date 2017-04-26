@@ -10,7 +10,7 @@ Put :crown:(```:crown:```) to the right of each team leader's id.
 - james010kim
 
 ### Team 2
-- dinggul
+- dinggul :crown:
 - SungbumAhn
 - mfaerevaag
 - nohkwak
