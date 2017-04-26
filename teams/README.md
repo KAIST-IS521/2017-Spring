@@ -32,7 +32,7 @@ Put :crown:(```:crown:```) to the right of each team leader's id.
 
 ### Team 5
 - bjgwak
-- JeongOhKye
+- JeongOhKye :crown:
 - blukat29
 - alinghi
 - donghwan17
