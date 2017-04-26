@@ -109,11 +109,12 @@ ptrace. Every time a breakpoint hits, your value tracer restores the
 original instruction and executes it in order to preserve the
 semantics of the original binary.
 
-\paragraph{Output.} The output is a CSV of two columns: (1) the
-current address (\texttt{EIP}), and (2) the traced value (4-byte
-register or memory value). Both values should be prefixed with `0x'.
-We will deduct the half of available points if you do not follow the
-convention.
+\paragraph{Output.} You should print out the output to a file called,
+\texttt{./output.csv}. The output is a CSV that consists of two
+columns: (1) the current address (\texttt{EIP}), and (2) the traced
+value (4-byte register or memory value). Both values should be
+prefixed with `0x'.  We will deduct the half of available points if
+you do not follow the convention.
 
 \paragraph{Evaluation.} To evaluate your value tracer, we will prepare
 for a list of binary and CSV pairs, and run your value tracer on them
