@@ -26,7 +26,7 @@ Put :crown:(```:crown:```) to the right of each team leader's id.
 ### Team 4
 - jaemoon-sim
 - jcassou
-- seungwonwoo
+- seungwonwoo :crown:
 - KAISTGUN
 - juanaevv
 
