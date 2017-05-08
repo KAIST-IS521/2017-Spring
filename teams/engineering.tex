@@ -425,9 +425,12 @@ least the following functionalities.
 You also need to write a test case (a program) for testing a DNS
 server using your library. Imagine there is a DNS server in your own
 private network. Your goal is to check whether the DNS server is
-working or not. You can send a raw DNS packet to the server and parse
-the returned message. Write your test case and run it with your SLA
-checker to see if it works.
+working or not. Your program should read in "./expect.csv" file which
+consists of two columns: the first column is a domain name to query
+(e.g. "bank.com"), and the second column is the IP expected as
+response (e.g. "10.0.0.1"). You can send a raw DNS packet to the
+server and parse the returned message. Write your test case and run it
+with your SLA checker to see if it works.
 
 Another thing to implement is a logger that periodically spawns a
 series of test cases provided by the user, and record the availability
@@ -472,7 +475,8 @@ To summarize:
 
   \item Implement flag updater.
 
-  \item Write test cases (SLA checkers) for a DNS server.
+  \item Write test cases (SLA checkers) for a DNS server and your log
+    visualizer service.
 
   \item Write the document about your design and implementation in
     \texttt{README.md}.
