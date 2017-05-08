@@ -6,3 +6,4 @@
 - Worm (03/20/2017) [[tex](0320-worm.tex)]
 - AV (03/27/2017) [[tex](0327-antimalware.tex)]
 - AV2 (04/10/2017) [[tex](0410-av2.tex)]
+- Debugger (04/24/2017) [[tex](0424-debugger.tex)]
