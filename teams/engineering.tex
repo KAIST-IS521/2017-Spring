@@ -1,0 +1,624 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fullpage}
+\usepackage[svgnames,x11names]{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+  breaklinks,
+  colorlinks,
+  linkcolor={blue!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!50!black}
+}
+\usepackage{amsthm}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{listings}
+\usepackage{xspace}
+
+\newcommand*{\Modone}{Bank\xspace}%
+\newcommand*{\modone}{bank\xspace}%
+\newcommand*{\Modtwo}{Shopping Mall\xspace}%
+\newcommand*{\modtwo}{shopping mall\xspace}%
+\newcommand*{\Modthree}{Network Operator\xspace}%
+\newcommand*{\modthree}{network operator\xspace}%
+\newcommand*{\Modfour}{Notary\xspace}%
+\newcommand*{\modfour}{notary\xspace}%
+\newcommand*{\Modfive}{Government\xspace}%
+\newcommand*{\modfive}{government\xspace}%
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Exercise}
+
+\begin{document}
+%%% Header starts
+\noindent{\large\textbf{IS-521 Activity}\hfill
+                \textbf{Team-based Software Engineering} \\
+         {\phantom{} \hfill Due Date: May 24, 2017 (before midnight)} \\
+%%% Header ends
+
+\section{Activity Overview}
+
+This is a team-based engineering activity. There are 6 teams in total
+(5 teams for students and 1 team for TAs), and each team has one
+public repository. Every repository will be in public, so we recommend
+everyone to submit Pull Requests (PRs) to other teams.
+
+\subsection{General Rule}
+
+\begin{enumerate}
+
+  \item \textbf{Email is not allowed}. Use GitHub to discuss: create
+    an issue if needed, and send PRs to the repositories.
+
+  \item Each team should set \textbf{milestones} on GitHub. Read the
+    article if you are not sure how to use milestones on
+    GitHub~\cite{githubissue}.
+
+  \item Make documents everywhere in markdown, e.g., README.md.
+
+  \item There should be a top-level makefile that builds and installs
+    everything.  For example, anyone should be able to configure your
+    module in a fresh new VM, provided in this course, by invoking
+    only the following command:
+    \begin{verbatim}git clone <your repo> && cd <repo dir> && make\end{verbatim}
+
+  \item Every team needs to provide a set of test cases for SLA (see
+    \S\ref{ss:sla}).
+
+\end{enumerate}
+
+\subsection{Coding Guideline}
+
+We will give you enough freedom, but please follow the three things:
+\begin{enumerate}
+
+  \item Use maximum 80 characters per line.
+  \item Do not use TAB. Use space chars instead.
+  \item Extensively comment your code.
+
+\end{enumerate}
+
+\subsection{Issue / Pull Request (PR) Guideline}
+
+Every student can submit PRs or issues to other teams, but the title
+of your PR should follow the guideline:
+%
+\begin{enumerate}
+%
+  \item If you are creating a PR for your own team, you can use any
+    title you want.
+%
+  \item If you are creating a PR to another team, you should indicate
+    in the title that you are from another team by adding a prefix:
+    ``[CROSS-TEAM]''.
+%
+\end{enumerate}
+%
+Notice that we will \textbf{\emph{NOT}} give you extra points if you do not
+follow the above guideline.
+
+\subsection{About Grading}
+
+In this activity, every member in a team will get the same score, but
+you can get individual extra points by submitting pull requests (or
+issues). Not every PR will result in extra points though.  Course
+staffs will carefully examine the quality of your PRs to decide
+whether to give extra points.
+
+There are two major things we expect from this activity. First, we
+will see how team members make use of GitHub features such as issues,
+pull requests, and milestones. Second, we will also see if each team
+has good team work. For example, we may ask the following questions.
+Is the work load distributed well to each team member? Do people
+communicate often through GitHub?
+
+\subsection{Test Cases for Service Level Availability (SLA)}
+\label{ss:sla}
+
+In the final CTF event of this course, we will employ an SLA checker
+that periodically checks if every service is operating normally. This
+means that you cannot simply shutdown your services to defend against
+all possible attacks. When our SLA checker detects that one of your
+service is down, we will deduct your points during the CTF event.
+
+In this activity, you need to provide a set of test cases for each
+program you developed. When we execute the service with the test cases
+you provided, we should be able to cover most of the logic in your
+code. In other words, we expect to achieve high \emph{code coverage}.
+We recommend you to measure the code coverage with a tool such as
+gcov~\cite{gcov} and coverage.py~\cite{pycov}, although this is not a
+strong requirement.
+
+Each test case in this activity is an executable program (or a script)
+that can be executed by simply invoking:
+\begin{verbatim}
+./progname <ip> <port>
+\end{verbatim}
+The program takes in two command line arguments: the target IP and the
+port number. When executed, the program will connect to the target
+address and check if the target service is operating normally. If so,
+the program terminates with an exit code of 0. Otherwise, the program
+terminates with an exit code of 1. When the program cannot even
+establish a connection to the target address, it returns an exit code
+of 2.
+
+Team-3 is responsible for building a library for SLA checking.
+Therefore, each team should frequently check the repository of Team-3
+and give feedback to them. See \S\ref{ss:modthree} to see the details
+about their tasks.
+
+\subsection{Flag Updater} \label{ss:flagupdater}
+
+Every team should develop their own flag updater program in this
+activity. The main reason why we need a flag updater is to dynamically
+change your flags during the CTF event. A flag updater runs as a
+daemon listening on port 42. It expects to get a JSON~\cite{json}
+message from the connected client.
+
+Figure~\ref{fig:flagupdater} describes the message format. There are
+three data fields: the ``signer'' field is a GitHub ID of the signer,
+the ``newflag'' field is a new string to be updated for the flag, and
+the ``signature'' field indicates a base64-encoded PGP signature. We
+generate the signature as follows. We first concatenate the GitHub ID
+of the signer with a colon `:' and the new flag. Thus, we get the
+following string: \texttt{GitHubID:1234567890ABCDEF}. Next we sign the
+concatenated string with the signer's private key. Finally, we
+base64-encode the signature.
+
+Your flag updater is application-specific, meaning that you should
+implement your own flag updater because the way you update your flag
+depends on your application.
+
+\begin{figure}[t]
+\begin{lstlisting}[basicstyle=\ttfamily]
+{
+  "signer" : "TA's ID",
+  "newflag": "1234567890ABCDEF",
+  "signature" : "<base64 encoded string>"
+}
+\end{lstlisting}
+\caption{An example of a flag updater message.}
+\label{fig:flagupdater}
+\end{figure}
+
+\subsection{Authentication} \label{ss:auth}
+
+Since we have everyone's PGP public key, we will use a simple PGP-key
+based authentication in this activity. First, a server asks your
+github ID. When a user provides their ID, the server creates a large
+random number and sends encrypts the number with the user's public
+key. The server sends the encrypted data along with its public
+key\footnote{
+%
+  You can use one of the team member's key, or you can simply create a
+  new PGP key pair for the service.
+%
+}, and the user decrypts it with her/his private key to get the
+original random number. The user now encrypts the random number with
+the server's public key and send the encrypted message back to the
+server. Server can verify whether this user has successfully decrypted
+the message.
+
+Throughout this document, whenever we say that you have to implement
+an authentication system, it means you have to implement this
+PGP-based authentication.
+
+\section{Design}
+
+We build a networked system in this activity. The system has 5 major
+modules: (1) \modone, (2) \modtwo, (3) \modthree, (4) \modfour, and
+(5) \modfive. You can assume that every module runs in a separate VM.
+Each module is connected to each other within a network. Each team is
+responsible for building each different module:
+
+\begin{center}
+  \begin{tabular}{ll}
+    Team 1 & \Modone \\
+    Team 2 & \Modtwo \\
+    Team 3 & \Modthree \\
+    Team 4 & \Modfour \\
+    Team 5 & \Modfive \\
+  \end{tabular}
+\end{center}
+
+\subsection{\Modone (Team-1)} \label{ss:modone}
+
+Your goal here is to build a virtual banking system. The system
+process runs at port 1588. When a client connect to this port, it
+displays a menu that shows two options: register a new user or login.
+In registration menu, the client should first authenticate him or her
+with PGP key, as described in (\S\ref{ss:auth}). When the identity is
+authenticated, the client can send a username and a password to create
+a new user account. After the client successfully logins to the
+system, it shows the following menus.
+
+\begin{enumerate}
+  \item Check balance
+  \item Check transaction history
+  \item Transfer
+  \item Edit user info (this menu includes editing the detailed user
+    information as well as removing the user account)
+\end{enumerate}
+
+You should make use of a relational database such as MySQL to store
+all the necessary information for your system. We expect you to design
+a schema for your database. When you design a schema, you should first
+consider all possible data types that you have to handle. You should
+try to be as realistic as possible. For example, you need to log every
+transaction along with time stamp in order to implement the second
+menu. You also need to gather information about your clients such as
+email address, cellphone number, etc.
+%
+In case you are not familiar with database design, refer to the
+following materials: \cite{dbdesign} and \cite{dbtutorial}.
+
+We assume that every student, but not every account, initially has
+1,000 won. This means, when you first create your account with your
+identity, you will be automatically given 1,000 won. Later on,
+however, you should not get any more money even though you create a
+new account after removing an existing one.
+
+Finally, you need to implement a flag updater (see
+\S\ref{ss:flagupdater}). Your flag updater gets a JSON message,
+verifies the signature of the message, and updates the email address
+field of ``admin'' with the given flag string.
+
+To summarize:
+\begin{enumerate}
+
+  \item Implement the \texttt{bank} program, which presents a
+    text-based interface for banking operations.
+
+  \item Design a realistic database schema for your system.
+
+  \item Implement a PGP-based authentication (\S\ref{ss:auth}).
+
+  \item Implement a flag updater.
+
+  \item Write the document about all the menus in your banking system
+    in \texttt{README.md}.
+
+  \item Write test cases (SLA checkers) for your bank.
+
+\end{enumerate}
+
+\subsection{\Modtwo (Team-2)}
+
+Your task is mainly twofold: (1) implement a web-based online shopping
+mall, and (2) implement a flag updater for this module.
+
+You have to design and implement an online shopping mall. Since this
+is a web-based service, it runs on port 80 with HTTP protocol. It
+should provide at least the following menus: (1) ``list'' menu shows a
+list of items, (2) ``search'' menu allows a user to find an item, (3)
+``shopping cart'', (4) ``view order'' menu allows a user to see the
+purchased item, and (5) ``message'' menu allows a user to send a
+message to the admin. You have to design your own database schema for
+this web application. Please refer to \S\ref{ss:modone} to see some
+advice and useful links about designing your database.
+
+There should be a detailed view page for each item. There should be a
+button on that page to buy the item, and another button to add the
+item to shopping cart. When you click the shopping cart menu, you
+should be able to see the list of added items on your shopping cart.
+
+In order to buy an item, a client should pay money via banking
+transaction. In specific, first the client should enter which account
+he or she will use to transfer money. Then you, as an admin, should
+create a temporary account on the bank (\S\ref{ss:modone}) with your
+own identity, and inform this temporary account to the user. Now you
+wait for one minute, expecting money transfer from the user's bank
+account previously entered.  While the system is waiting for bank
+transaction, this order should appear as ``pending'' in ``view order''
+menu. When you got correct amount of money transferred to your
+temporary account, you should delete the account (yes you just throw
+away the money for simplicity), and set the order status to be
+``complete''. If the one minute timeout expires or the amount of money
+transferred is not enough, you simply cancel the order and delete the
+temporary account. Also, this order should not appear anymore in the
+``view order'' menu.
+
+You can put any kinds of products on your web page, but there should
+be a special item called ``CTF Flag''. This item has unlimited supply:
+people can buy as many as they want. The price of the item must be
+1,000,000,000 won, so normal clients would not be able to buy it. If a
+client purchased this item, then the client should be able to see the
+content of the item from the ``view order'' menu. Of course the client
+cannot see the contents while the order status is ``pending''. When
+the order status becomes ``complete'', a ``view'' button should appear
+right next to the ordering status. When a client clicks the ``view''
+button to see the contents, the web application should read a file
+located at \texttt{/var/ctf/shoppingmall.flag}, and display the flag.
+
+Finally, you need to implement a flag updater (see
+\S\ref{ss:flagupdater}). Your flag updater gets a JSON message,
+verifies the signature of the message, and updates content of the file
+located at \texttt{/var/ctf/shoppingmall.flag}.
+
+Note that since the shopping mall module will be communicating with
+bank system (\S\ref{ss:modone}), you should be aware of the bank
+system's detailed implementation. Therefore, Team-2 should frequently
+check the repository of Team-1. Or, the two teams can agree upon a
+specific protocol in advance (e.g. which string will be used by the
+bank system to display the menus), and follow it during the
+implementation.
+
+To summarize:
+\begin{enumerate}
+
+  \item Implement an online shopping mall web application.
+
+  \item Design a realistic database schema for your system.
+
+  \item Put more than 10 items to make it look nice. One of the items
+    should be a ``CTF Flag'', and the price of it should be
+    1,000,000,000 won. When the item is purchased, a client can see
+    the content of the flag.
+
+  \item Implement flag updater.
+
+  \item Write the document about all the menus in your shopping mall
+    system in \texttt{README.md}.
+
+  \item Write test cases (SLA checkers) for your web app.
+
+\end{enumerate}
+
+\subsection{\Modthree (Team-3)} \label{ss:modthree}
+
+There are three main tasks here: (1) building a library for SLA, (2)
+building a SLA logger, and (3) implement a web app that visualizes an
+SLA log.
+
+First, you need to build an SLA checker library in C. Recall from
+\S\ref{ss:sla}, SLA checker is a program that takes as input a target
+address and a port number, and outputs an exit code of 0, 1, or 2
+depending on the service availability. The library needs to provide at
+least the following functionalities.
+
+\begin{enumerate}
+%
+  \item \texttt{int openTCPSock(char *IP, unsigned short port)}\\
+    This function returns a TCP socket handle that can be used to
+    communicate with the service running in the provided IP and port
+    number. The function should return a negative value to indicate an
+    error. It would be desirable to return different negative value
+    for different error, to provide useful information to the library
+    user. Describe the specification of this return value in your
+    \texttt{README.md} file.
+%
+  \item \texttt{int openUDPSock(char *IP, unsigned short port)}\\
+    This function is the same as \texttt{openTCPSock} except that it
+    opens a UDP socket.
+%
+  \item \texttt{void closeSock(int sock)}\\
+    This function closes the given socket handle.
+%
+  \item \texttt{ssize\_t recvMsgUntil(int sock, const char* regex,
+    void* buf, size\_t n)}\\
+    This function reads in maximum \texttt{n} bytes from the given
+    socket. The received data is stored into a buffer pointed by
+    \texttt{buf}. The function must return as soon as the data
+    received so far matches the provided regular expression
+    \texttt{regex}. The return value is the length of data received at
+    the point of return. If an error occurred while receiving the
+    data, return a negative integer value. Likewise, describe the
+    return value's specification in \texttt{README.md} file.
+%
+  \item \texttt{int sendMsg(int sock, const char* buf, size\_t n)}\\
+    This function sends a string to the connected socket. It returns a
+    negative value when there is an error. You should document its
+    specification in \texttt{README.md} file.
+%
+  \item \texttt{int handshake(int sock, const char* ID, const char*
+    privKeyPath, const char* passPath, const char* successMsg)}\\
+    This function performs PGP-based authentication described in
+    \S\ref{ss:auth}. \texttt{ID} is the Github ID of the client.
+    \texttt{privKeyPath} is a path to PGP private key file, and
+    \texttt{passPath} is a path of the passphrase file for the private
+    key. \texttt{successMsg} is the expected string from server if the
+    authentication succeeded. Decide the return value for each
+    possible situation, and document it in \texttt{README.md} file.
+%
+\end{enumerate}
+
+You also need to write a test case (a program) for testing a DNS
+server using your library. Imagine there is a DNS server in your own
+private network. Your goal is to check whether the DNS server is
+working or not. You can send a raw DNS packet to the server and parse
+the returned message. Write your test case and run it with your SLA
+checker to see if it works.
+
+Another thing to implement is a logger that periodically spawns a
+series of test cases provided by the user, and record the availability
+of a set of target services. The log is in a CSV
+format~\cite{csvwiki}. There are four columns in total in the log: (1)
+UNIX timestamp, (2) target IP address, (3) target port address, (4)
+status. The status field is represented with either ``up'' or
+``down''. The usage of the logger should be:
+%
+\begin{verbatim}
+./logger [ip addr] [port] [dir containing test cases] [logfile]
+\end{verbatim}
+%
+The third argument of the logger is a path to a directory that
+contains a list of test cases. The fourth argument is a path to the
+output log file. The logger uses a \texttt{seccomp} filter to sandbox
+the execution environment. You have to set your criteria, and make a
+document in your \texttt{README.md} file. Type \texttt{man seccomp}
+for more information.
+
+You also need to provide a web interface that shows a line graph where
+X-axis is time, and Y-axis is the availability of a service. The web
+application takes in a log file as input from a user, and shows the
+corresponding line graph. Each service corresponds to a line in the
+graph. This page should be only usable to its team members. To
+authenticate the identity of the team members, implement a PGP-based
+authentication described in \S\ref{ss:auth}.
+
+Finally, you need to implement a flag updater (see
+\S\ref{ss:flagupdater}). Your flag updater gets a JSON message,
+verifies the signature of the message, and updates content of the file
+located at \texttt{/var/ctf/sla.flag}.
+
+To summarize:
+\begin{enumerate}
+
+  \item Implement SLA checker library.
+
+  \item Implement SLA logger (with seccomp).
+
+  \item Implement a web-based log visualizer.
+
+  \item Implement flag updater.
+
+  \item Write test cases (SLA checkers) for a DNS server.
+
+  \item Write the document about your design and implementation in
+    \texttt{README.md}.
+
+\end{enumerate}
+
+\subsection{\Modfour (Team-4)} \label{ss:notary}
+
+Your goal is twofold here: (1) build a notary program, and (2) build a
+launcher program that only executes a signed program by the notary.
+
+Notary runs at port 8000. It simply takes in a file as input from a
+client, and returns the file along with a signature of the file. Of
+course, only an authenticated user should be able to get a signature
+from the notary. To check the authenticity, it uses PGP keys that we
+used in the class. In particular, the notary program takes in one
+command line argument: a path to a directory that contains PGP public
+keys. It only accepts files that are signed by an owner of the public
+keys.
+%
+The notary program should log all the events to one or more files in
+the directory: \texttt{/var/log/notary/}.
+
+We do not specify the output format in detail, but it should be in
+JSON, and you should detail the format in your document (README.md).
+
+The second program to write is a launcher, which takes in a certified
+program from the notary, and executes it only when the program is
+certified. Since this can be potentially vulnerable, you want to
+create a chrooted environment for executing the program. The launcher
+takes in a JSON-based request at port 8001, but it only accepts
+packets coming from a local network. The JSON has the following form:
+
+\begin{lstlisting}
+{
+  "name": "name of the program",
+  "body": "base64 encoded program executable"
+}
+\end{lstlisting}
+
+To only accept packets from the local network, the launcher takes in
+two command line arguments that specifies the range of allowed IPv4
+addresses. For example, if 10.0.0.1 and 10.0.0.10 are given as command
+line arguments, then it means we can only accept network packets from
+the IP addresses from 10.0.0.1 to 10.0.0.10. Your launcher should
+analyze the IP layer packets to check where the messages are coming
+from.
+
+Additionally, your launcher should perform a system call tracing using
+the ptrace system call. In particular, you want to prevent a program
+to spawn an \texttt{execve} system call, because it may spawn an
+unwanted shell to an attacker.
+
+Finally, you need to implement a flag updater (see
+\S\ref{ss:flagupdater}). Your flag updater gets a JSON message,
+verifies the signature of the message, and updates content of the file
+located at \texttt{/var/ctf/notary.flag}.
+
+To summarize:
+\begin{enumerate}
+
+  \item Implement a notary program.
+
+  \item Write your format specification for returning messages from
+    the notary program.
+
+  \item Implement a launcher program.
+
+  \item Implement flag updater.
+
+  \item Write test cases (SLA checkers) for your notary and launcher.
+
+  \item Write the document about your design and implementation in
+    \texttt{README.md}.
+
+\end{enumerate}
+
+\subsection{\Modfive (Team-5)}
+
+You need to design two things here: a web service, and a bot that
+automatically browses the web.
+
+Government is a virtual object. Government runs its own homepage at
+port 80. The homepage has several static web pages as well as dynamic
+web pages. Static web pages include some information about the
+government. Dynamic web pages are basically to host a web-based
+bulletin board. Anyone should be able to create a user account and
+write a message to the board. All the information including the user
+account information and messages should be written in a database. Do
+\emph{not} use existing solutions such as zeroboard for this project.
+In the bulletin board, we use the PGP-based login mechanism described
+in \S\ref{ss:auth}.
+
+A logged in user should be able to view a bulletin board, and there
+should be at least six operations in the bulletin board: (1) ``list''
+operation shows a list of postings, (2) ``write'' operation writes a
+new posting to the board, (3) ``read'' operation reads the contents of
+a specific posting, (4) ``delete'' operation removes a specific
+posting from the board, (5) ``edit'' operation edits the contents of a
+specific posting from the board, and (6) ``authenticate'' operation
+enables a user to notarize with the notary service
+(\S\ref{ss:notary}).
+
+Notice that there are two types of users for the bulletin board: (1)
+normal user, and (2) notarized user. Normal users cannot write a post
+that contains Javascript, whereas notarized users can. To get
+notarized by the notary service, a user needs to supply a signed JSON
+file from the notary. The JSON file should contain the user's ID and
+the user's public key. You have to design a web interface that a valid
+user can get notarized after login.
+
+You also need to design and implement a browsing bot. This bot
+launches a real web browser such as firefox and chrome. It parses the
+currently loaded web page, and clicks links of your interest. We
+expect your bot to read \emph{every} posting from the bulletin board.
+You can write such an application using WebDriver~\cite{webdriver}.
+The web browser used by the bot should have a cookie originated from a
+virtual web site called \texttt{bank.com}. The cookie contains a
+record, which has the name ``flag'', and the value of the flag is a
+32-byte random ASCII string.
+
+Finally, you need to implement a flag updater (see
+\S\ref{ss:flagupdater}). Your flag updater gets a JSON message,
+verifies the signature of the message, and updates content of the
+cookie for the domain \texttt{bank.com}. Specifically, it modify the
+``flag'' value of the cookie.
+
+To summarize:
+\begin{enumerate}
+
+  \item Implement a bulletin board web application.
+
+  \item Implement a government homepage that has a bulletin board.
+
+  \item Implement a bot with WebDriver.
+
+  \item Implement flag updater.
+
+  \item Write test cases (SLA checkers) for your web app.
+
+  \item Write the document about your design and implementation in
+    \texttt{README.md}.
+
+\end{enumerate}
+
+\bibliography{references}
+\bibliographystyle{plainnat}
+
+\end{document}
