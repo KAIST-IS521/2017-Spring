@@ -165,6 +165,9 @@ following string: \texttt{GitHubID:1234567890ABCDEF}. Next we sign the
 concatenated string with the signer's private key. Finally, we
 base64-encode the signature.
 
+N.B. We will encrypt every message with the corresponding team's
+public key\footnotemark[1].
+
 Your flag updater is application-specific, meaning that you should
 implement your own flag updater because the way you update your flag
 depends on your application.
@@ -177,7 +180,7 @@ depends on your application.
   "signature" : "<base64 encoded string>"
 }
 \end{lstlisting}
-\caption{An example of a flag updater message.}
+\caption{An example of a flag updater message (before encryption).}
 \label{fig:flagupdater}
 \end{figure}
 
