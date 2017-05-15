@@ -295,10 +295,14 @@ is a web-based service, it runs on port 80 with HTTP protocol. It
 should provide at least the following menus: (1) ``list'' menu shows a
 list of items, (2) ``search'' menu allows a user to find an item, (3)
 ``shopping cart'', (4) ``view order'' menu allows a user to see the
-purchased item, and (5) ``message'' menu allows a user to send a
-message to the admin. You have to design your own database schema for
+purchased item, (5) ``message'' menu allows a user to send a message
+to the admin, and (6) ``my page'' menu allows a user to see the
+personal information. You have to design your own database schema for
 this web application. Please refer to \S\ref{ss:modone} to see some
 advice and useful links about designing your database.
+
+In your system, each user should use the PGP-based authentication
+mechanism described in \S\ref{ss:auth}.
 
 There should be a detailed view page for each item. There should be a
 button on that page to buy the item, and another button to add the
@@ -320,6 +324,10 @@ away the money for simplicity), and set the order status to be
 transferred is not enough, you simply cancel the order and delete the
 temporary account. Also, this order should not appear anymore in the
 ``view order'' menu.
+
+For the ``message'' menu, the messages to admin will be stored in
+your database. And you will see all of the messages in the ``my
+page'' menu when you sign in.
 
 You can put any kinds of products on your web page, but there should
 be a special item called ``CTF Flag''. This item has unlimited supply:
