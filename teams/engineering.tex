@@ -191,18 +191,18 @@ depends on your application.
 Since we have everyone's PGP public key, we will use a simple PGP-key
 based authentication in this activity. First, a server asks your
 github ID. When a user provides their ID, the server creates a large
-random number and sends encrypts the number with the user's public
-key. The server sends the encrypted data along with its public
-key\footnote{
+random number. The server signs the number with its private key
+\footnote{
 %
   You can use one of the team member's key, or you can simply create a
   new PGP key pair for the service.
 %
-}, and the user decrypts it with her/his private key to get the
-original random number. The user now encrypts the random number with
-the server's public key and send the encrypted message back to the
-server. Server can verify whether this user has successfully decrypted
-the message.
+}, and encrypts the number with the user's public key. Then the server
+sends the encrypted data, and the user decrypts it with her/his
+private key to get the original random number. The user now encrypts
+the random number with the server's public key and send the encrypted
+message back to the server. Server can verify whether this user has
+successfully decrypted the message.
 
 Throughout this document, whenever we say that you have to implement
 an authentication system, it means you have to implement this
