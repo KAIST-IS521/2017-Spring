@@ -604,16 +604,17 @@ launches a real web browser such as firefox and chrome. It parses the
 currently loaded web page, and clicks links of your interest. We
 expect your bot to read \emph{every} posting from the bulletin board.
 You can write such an application using WebDriver~\cite{webdriver}.
-The web browser used by the bot should have a cookie originated from a
-virtual web site called \texttt{bank.com}. The cookie contains a
-record, which has the name ``flag'', and the value of the flag is a
-32-byte random ASCII string.
+The web browser used by the bot should have a cookie originated from
+the web site specified in a configuration file. The configuration file
+should contain the URL of a valid web site. Please describe the
+configuration file's path and format in README.md. The cookie contains
+a record, which has the name ``flag'', and the value of this record is
+a 32-byte random ASCII string.
 
 Finally, you need to implement a flag updater (see
 \S\ref{ss:flagupdater}). Your flag updater gets a JSON message,
 verifies the signature of the message, and updates content of the
-cookie for the domain \texttt{bank.com}. Specifically, it modify the
-``flag'' value of the cookie.
+cookie. Specifically, it modify the ``flag'' value of the cookie.
 
 To summarize:
 \begin{enumerate}
